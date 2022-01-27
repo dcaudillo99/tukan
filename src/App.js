@@ -1,23 +1,27 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.scss';
+import ChatComponent from "./components/chat/Chat.component";
+import Login from "./views/auth/Login.view";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {getUsername} from "./utils/auth";
 
 function App() {
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if(token) setUser(getUsername(token))
+    }, [])
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+          <BrowserRouter>
+              <Routes>
+                  <Route path="/">
+                      <Route path="" element={user ? <ChatComponent/> : <Login />} />
+                      <Route path="messages" element={user ? <ChatComponent /> : <Login />} />
+                  </Route>
+              </Routes>
+          </BrowserRouter>
     </div>
   );
 }
