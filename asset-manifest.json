@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/tukan/static/css/main.31212c3a.css",
+    "main.js": "/tukan/static/js/main.a541d52b.js",
+    "static/js/787.cc03f312.chunk.js": "/tukan/static/js/787.cc03f312.chunk.js",
+    "index.html": "/tukan/index.html",
+    "main.31212c3a.css.map": "/tukan/static/css/main.31212c3a.css.map",
+    "main.a541d52b.js.map": "/tukan/static/js/main.a541d52b.js.map",
+    "787.cc03f312.chunk.js.map": "/tukan/static/js/787.cc03f312.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31212c3a.css",
+    "static/js/main.a541d52b.js"
+  ]
+}
