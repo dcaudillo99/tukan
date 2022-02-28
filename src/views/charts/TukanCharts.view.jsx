@@ -4,7 +4,7 @@ import TukanChartSelector from "../../components/chart-selector/TukanChartSelect
 
 const TukanCharts = ({otherProps, serie }) => {
   const [data, setData] = useState(serie);
-  const CHART_TYPES = ['BAR', 'LINE', 'TABLE'];
+  const CHART_TYPES = ['BAR', 'LINE'];
   const [chartType, setChartType] = useState(CHART_TYPES[0]);
 
   const handleOnSetChartType = (evt) => {

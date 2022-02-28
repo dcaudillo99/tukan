@@ -1,12 +1,11 @@
 import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/toolkit';
 import axios from "axios";
 import RequestStatus from "../shared/enum/request-status.enum";
+import InitialReducerState from "../shared/initial-reducer-state";
+
 const moduleName = `charts`;
 const chartsAdapter = createEntityAdapter({});
-const initialState = chartsAdapter.getInitialState({
-  status: RequestStatus.Loading,
-  error: null
-});
+const initialState = chartsAdapter.getInitialState(InitialReducerState);
 
 export const getChartList = createAsyncThunk(`${moduleName}/getChartList`, async (config, { rejectWithValue }) => {
   try {
@@ -17,9 +16,10 @@ export const getChartList = createAsyncThunk(`${moduleName}/getChartList`, async
       }
     });
     return data.bmx.series.map(_serie => ({..._serie, id:_serie.idSerie}));
-  } catch (error) {
-    if (!error.message) throw error;
-    return rejectWithValue(error);
+  } catch (err) {
+    const { response } = err;
+    if (response.data.message) throw response.data.message;
+    return rejectWithValue(response);
   }
 });
 
@@ -39,6 +39,7 @@ const chartsSlice = createSlice({
     [getChartList.pending]: onPending,
     [getChartList.rejected]: onRejected,
     [getChartList.fulfilled]: (state, action) => {
+      state.error = null;
       state.status = RequestStatus.Succeeded;
       chartsAdapter.upsertMany(state, action.payload);
     },

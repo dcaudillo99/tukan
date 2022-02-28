@@ -1,37 +1,66 @@
-import React, {useMemo} from "react"
-import {Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis} from "recharts";
-import { useCurrentPng } from "recharts-to-png";
-import FileSaver from "file-saver";
-import {useCallback} from "react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import {useRef} from "react";
 
-const TukanBarChart = ({data}) => {
-  const [getPng, { ref, isLoading }] = useCurrentPng();
+const TukanBarChart = ({serie}) => {
+  const chartRef = useRef(null);
 
-  const handleDownload = useCallback(async () => {
-    const png = await getPng();
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
-    // Verify that png is not undefined
-    if (png) {
-      // Download with FileSaver
-      FileSaver.saveAs(png, `${data.idSerie}-${data.titulo}-bar-chart.png`);
-    }
-  }, [data.idSerie, data.titulo, getPng]);
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Bar Chart',
+      },
+    },
+  };
 
-  return useMemo(() => (
-    <div className="py-4">
-      <BarChart barGap={8} width={730} height={250} data={data.datos} ref={ref}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="fecha" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Bar name={`${data.idSerie}-${data.titulo}`} dataKey="dato" fill="#008080" />
-      </BarChart>
-      <button className="opacity-50 hover:opacity-90 bg-gray-600 rounded-lg p-2 text-white" onClick={handleDownload}>
-        {isLoading ? 'Downloading...' : 'Download Chart'}
-      </button>
-    </div>
-  ), [data.datos, data.idSerie, data.titulo, handleDownload, isLoading, ref])
+  const data = {
+    labels: serie.datos.map((_data) => _data.fecha),
+    datasets: [
+      {
+        label: serie.titulo,
+        data: serie.datos.map((_data) => _data.dato),
+        borderColor: `rgb(0,128,128)`,
+        backgroundColor: `rgba(0,128,128, 1)`,
+      }
+    ]
+  };
+
+  const handleDownloadChart = () => {
+    const base64Image = chartRef.current.toBase64Image();
+    const a = document.createElement('a');
+    a.href = base64Image;
+    a.download = `${serie.idSerie}-${serie.titulo}-bar-chart`;
+    a.click();
+  }
+
+  return (
+    <>
+      <Bar options={options} data={data} ref={chartRef} />
+      <button className="opacity-50 hover:opacity-90 bg-slate-600 rounded-md p-2 text-white my-2" onClick={handleDownloadChart}>Download</button>
+    </>
+  )
 }
 
 export default TukanBarChart;

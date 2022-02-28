@@ -1,38 +1,67 @@
-import React, {useCallback, useMemo} from 'react'
-import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
-import {useCurrentPng} from "recharts-to-png";
-import FileSaver from "file-saver";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import {useRef} from "react";
 
-const TukanLineChart = ({ data }) => {
-  const [getPng, { ref, isLoading }] = useCurrentPng();
+const TukanLineChart = ({ serie }) => {
+  const chartRef = useRef(null);
 
-  const handleDownload = useCallback(async () => {
-    const png = await getPng();
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
-    // Verify that png is not undefined
-    if (png) {
-      // Download with FileSaver
-      FileSaver.saveAs(png, `${data.idSerie}-${data.titulo}-line-chart.png`);
-    }
-  }, [data.idSerie, data.titulo, getPng]);
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Line Chart',
+      },
+    },
+  };
 
-  return useMemo(() =>
-    (
-      <div className="py-4">
-        <LineChart width={730} height={250} data={data.datos}
-                   margin={{ top: 5, right: 30, left: 20, bottom: 5 }} ref={ref}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="fecha" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line name={`${data.idSerie}-${data.titulo}`} type="monotone" dataKey="dato" stroke="#008080" />
-        </LineChart>
-        <button className="opacity-50 hover:opacity-90 bg-gray-600 rounded-lg p-2 text-white" onClick={handleDownload}>
-          {isLoading ? 'Downloading...' : 'Download Chart'}
-        </button>
-      </div>
-    ), [data.datos, data.idSerie, data.titulo, handleDownload, isLoading, ref]
+  const data = {
+    labels: serie.datos.map((_data) => _data.fecha),
+    datasets: [
+      {
+        label: serie.titulo,
+        data: serie.datos.map((_data) => _data.dato),
+        borderColor: `rgb(0,128,128)`,
+        backgroundColor: `rgba(0,128,128, 1)`,
+      }
+    ]
+  };
+
+  const handleDownloadChart = () => {
+    const base64Image = chartRef.current.toBase64Image();
+    const a = document.createElement('a');
+    a.href = base64Image;
+    a.download = `${serie.idSerie}-${serie.titulo}-line-chart`;
+    a.click();
+  }
+
+  return(
+    <>
+      <Line options={options} data={data} ref={chartRef} />
+      <button className="opacity-50 hover:opacity-90 bg-slate-600 rounded-md p-2 text-white my-2" onClick={handleDownloadChart}>Download</button>
+    </>
   )
 }
 
