@@ -12,7 +12,7 @@ export const getChartList = createAsyncThunk(`${moduleName}/getChartList`, async
     const { data } = await axios.get(`https://5i8qcjp333.execute-api.us-east-1.amazonaws.com/dev/series/${config.sets.value}?token=${config.token.value}`, {
       headers: {
         Accept: 'application/json',
-        Authorization: config.token.value
+        Authorization: '01f04831044f073702d9244604d41c055e7c14bb96218e169926482fb5699788'
       }
     });
     return data.bmx.series.map(_serie => ({..._serie, id:_serie.idSerie}));
